@@ -1,0 +1,25 @@
+version: '3'
+services:
+  staging:
+    image: nginx:latest
+    ports:
+      - ${PORT_STAGING}
+
+  prod:
+    image: nginx:latest
+    ports:
+      - ${PORT_PROD}
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    privileged: true
+    environment:
+      - REGISTRATION_TOKEN=${REGISTRATION_TOKEN}
+      - CI_SERVER_URL=${CI_SERVER_URL}
+      - DESCRIPTION=le_runner_local
+      - RUNNER_EXECUTOR=docker
+      - TAG_LIST=docker
+    volumes:
+      - ${GITLAB_HOME}/gitlab-runner/config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always

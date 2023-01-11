@@ -1,0 +1,37 @@
+variables:
+  NODE_VERSION: "19"
+
+# include:
+#   - template: Code-Quality.gitlab-ci.yml
+
+stages:
+  - generate
+  - test
+  - build
+  - deploy
+
+
+
+build:front:
+  image: node:$NODE_VERSION
+
+  stage: build
+  
+  tags:
+  - docker-test
+
+  script:
+    - echo "this job runs on the medium instance"
+    - npm i
+    - npm run build
+    - docker build -f Dockerfile -t staging:$CI_COMMIT_SHA
+    - docker run --name staging -d staging:$CI_COMMIT_SHA
+
+deploy:front:
+  image: node:$NODE_VERSION
+  stage: deploy
+  tags:
+  - docker-test
+  script:
+    - docker build -f Dockerfile -t staging:$CI_COMMIT_SHA
+    - docker run --name staging -d staging:$CI_COMMIT_SHA
